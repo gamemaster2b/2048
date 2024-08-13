@@ -5,7 +5,7 @@ fn setup(mut commands: Commands) {
     commands.spawn(Camera2dBundle::default());
 }
 
-const TILE_SIZE: f32 = 60.0;
+const TILE_SIZE: f32 = 120.0;
 
 #[derive(Component)]
 struct Board {
@@ -29,6 +29,12 @@ fn spawn_board(mut commands: Commands) {
 
 fn main() {
     App::new()
+        .insert_resource(ClearColor(Color::Oklcha(Oklcha {
+            lightness: 0.2706,
+            chroma: 0.035,
+            hue: 267.69,
+            alpha: 1.0,
+        })))
         .add_plugins(DefaultPlugins.set(WindowPlugin {
             primary_window: Some(Window {
                 title: "2048".to_string(),
