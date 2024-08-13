@@ -4,7 +4,7 @@ fn setup(mut commands: Commands) {
     commands.spawn(Camera2dBundle::default());
 }
 
-const TILE_SIZE: f32 = 40.0;
+const TILE_SIZE: f32 = 60.0;
 
 #[derive(Component)]
 struct Board {
