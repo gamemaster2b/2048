@@ -1,4 +1,5 @@
 use bevy::prelude::*;
+mod colors;
 
 fn setup(mut commands: Commands) {
     commands.spawn(Camera2dBundle::default());
@@ -18,6 +19,7 @@ fn spawn_board(mut commands: Commands) {
         .spawn(SpriteBundle {
             sprite: Sprite {
                 custom_size: Some(Vec2::new(physical_board_size, physical_board_size)),
+                color: colors::BOARD,
                 ..Default::default()
             },
             ..Default::default()
