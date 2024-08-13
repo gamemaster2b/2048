@@ -1,5 +1,9 @@
 use bevy::prelude::*;
 
+fn setup(mut commands: Commands) {
+    commands.spawn(Camera2dBundle::default());
+}
+
 fn main() {
     App::new()
         .add_plugins(DefaultPlugins.set(WindowPlugin {
@@ -9,5 +13,6 @@ fn main() {
             }),
             ..Default::default()
         }))
+        .add_systems(Startup, setup)
         .run();
 }
