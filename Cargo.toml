@@ -1,10 +1,11 @@
 [package]
-name = "games"
+name = "2048"
 version = "0.1.0"
 edition = "2021"
 
 [dependencies]
 bevy = "0.14.1"
+itertools = "0.13.0"
 
 # Enable a small amount of optimization in the dev profile.
 [profile.dev]
