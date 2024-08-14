@@ -12,38 +12,49 @@ const TILE_SPACER: f32 = 15.0;
 #[derive(Component)]
 struct Board {
     size: u8,
+    physical_size: f32,
+}
+
+impl Board {
+    fn new(size: u8) -> Board {
+        let physical_size: f32 = f32::from(size) * TILE_SIZE + f32::from(size + 1) * TILE_SPACER;
+        Board {
+            size,
+            physical_size,
+        }
+    }
+    fn tile_position_on_board(&self, x_axis: u8, y_axis: u8) -> (f32, f32, f32) {
+        let offset = -&self.physical_size / 2.0 + 0.5 * TILE_SIZE;
+        (
+            (offset + TILE_SIZE * f32::from(x_axis) + f32::from(x_axis + 1) * TILE_SPACER),
+            (offset + TILE_SIZE * f32::from(y_axis) + f32::from(y_axis + 1) * TILE_SPACER),
+            1.0,
+        )
+    }
 }
 
 fn spawn_board(mut commands: Commands) {
-    let board = Board { size: 4 };
-    let physical_board_size = f32::from(board.size) * TILE_SIZE;
+    let board = Board::new(4);
     commands
         .spawn(SpriteBundle {
             sprite: Sprite {
-                custom_size: Some(Vec2::new(physical_board_size, physical_board_size)),
+                custom_size: Some(Vec2::new(board.physical_size, board.physical_size)),
                 color: colors::BOARD,
                 ..Default::default()
             },
             ..Default::default()
         })
         .with_children(|builder| {
-            let offset = -physical_board_size / 2.0 + 0.5 * TILE_SIZE;
-
             for tile in (0..board.size).cartesian_product(0..board.size) {
+                let (x, y, z) = board.tile_position_on_board(tile.0, tile.1);
+
                 builder.spawn(SpriteBundle {
                     sprite: Sprite {
                         color: colors::TILE_PLACEHOLDER,
-                        custom_size: Some(Vec2::new(
-                            TILE_SIZE - TILE_SPACER * 2f32,
-                            TILE_SIZE - TILE_SPACER * 2f32,
-                        )),
+                        custom_size: Some(Vec2::new(TILE_SIZE, TILE_SIZE)),
                         ..Default::default()
                     },
-                    transform: Transform::from_xyz(
-                        offset + f32::from(tile.0) * TILE_SIZE,
-                        offset + f32::from(tile.1) * TILE_SIZE,
-                        1.0,
-                    ),
+                    transform: Transform::from_xyz(x, y, z),
                     ..Default::default()
                 });
             }
