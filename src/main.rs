@@ -8,7 +8,7 @@ fn setup(mut commands: Commands) {
 }
 
 const TILE_SIZE: f32 = 120.0;
-const TILE_SPACER: f32 = 15.0;
+const TILE_SPACER: f32 = 10.0;
 
 #[derive(Component)]
 struct Board {
@@ -110,6 +110,6 @@ fn main() {
             }),
             ..Default::default()
         }))
-        .add_systems(Startup, (setup, (spawn_board,spawn_tiles).chain()))
+        .add_systems(Startup, (setup, (spawn_board, spawn_tiles).chain()))
         .run();
 }
