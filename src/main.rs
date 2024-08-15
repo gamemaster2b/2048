@@ -1,5 +1,6 @@
 use bevy::prelude::*;
 use itertools::Itertools;
+use rand::seq::IteratorRandom;
 mod colors;
 
 fn setup(mut commands: Commands) {
@@ -23,16 +24,15 @@ impl Board {
             physical_size,
         }
     }
-    fn tile_position_on_board(&self, x_axis: u8, y_axis: u8) -> (f32, f32, f32) {
+    fn tile_position_on_board(&self, x_axis: u8, y_axis: u8, z_axis: f32) -> (f32, f32, f32) {
         let offset = -&self.physical_size / 2.0 + 0.5 * TILE_SIZE;
         (
             (offset + TILE_SIZE * f32::from(x_axis) + f32::from(x_axis + 1) * TILE_SPACER),
             (offset + TILE_SIZE * f32::from(y_axis) + f32::from(y_axis + 1) * TILE_SPACER),
-            1.0,
+            z_axis,
         )
     }
 }
-
 fn spawn_board(mut commands: Commands) {
     let board = Board::new(4);
     commands
@@ -46,7 +46,7 @@ fn spawn_board(mut commands: Commands) {
         })
         .with_children(|builder| {
             for tile in (0..board.size).cartesian_product(0..board.size) {
-                let (x, y, z) = board.tile_position_on_board(tile.0, tile.1);
+                let (x, y, z) = board.tile_position_on_board(tile.0, tile.1, 1.0);
 
                 builder.spawn(SpriteBundle {
                     sprite: Sprite {
@@ -62,6 +62,44 @@ fn spawn_board(mut commands: Commands) {
         .insert(board);
 }
 
+#[derive(Component)]
+struct Points {
+    value: usize,
+}
+
+#[derive(Component)]
+struct Position {
+    x_axis: u8,
+    y_axis: u8,
+}
+
+fn spawn_tiles(mut comands: Commands, query_board: Query<&Board>) {
+    let board = query_board.single();
+    let mut rng = rand::thread_rng();
+    let starting_tiles = (0..board.size)
+        .cartesian_product(0..board.size)
+        .choose_multiple(&mut rng, 2);
+    for (pos_x, pos_y) in starting_tiles.iter() {
+        let pos = Position {
+            x_axis: *pos_x,
+            y_axis: *pos_y,
+        };
+        let (x, y, z) = board.tile_position_on_board(pos.x_axis, pos.y_axis, 2.0);
+        comands
+            .spawn(SpriteBundle {
+                sprite: Sprite {
+                    color: colors::TILE,
+                    custom_size: Some(Vec2::new(TILE_SIZE * 0.9, TILE_SIZE * 0.9)),
+                    ..Default::default()
+                },
+                transform: Transform::from_xyz(x, y, z),
+                ..Default::default()
+            })
+            .insert(Points { value: 2usize })
+            .insert(pos);
+    }
+}
+
 fn main() {
     App::new()
         .insert_resource(ClearColor(colors::CLEAR_COLOR))
@@ -72,6 +110,6 @@ fn main() {
             }),
             ..Default::default()
         }))
-        .add_systems(Startup, (setup, spawn_board))
+        .add_systems(Startup, (setup, (spawn_board,spawn_tiles).chain()))
         .run();
 }
