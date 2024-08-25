@@ -8,7 +8,7 @@ fn setup(mut commands: Commands) {
 }
 
 const TILE_SIZE: f32 = 120.0;
-const TILE_SPACER: f32 = 10.0;
+const TILE_SPACER: f32 = 15.0;
 
 #[derive(Component)]
 struct Board {
@@ -18,7 +18,7 @@ struct Board {
 
 impl Board {
     fn new(size: u8) -> Board {
-        let physical_size: f32 = f32::from(size) * TILE_SIZE + f32::from(size + 1) * TILE_SPACER;
+        let physical_size = f32::from(size) * TILE_SIZE + f32::from(size + 1) * TILE_SPACER;
         Board {
             size,
             physical_size,
@@ -33,6 +33,7 @@ impl Board {
         )
     }
 }
+
 fn spawn_board(mut commands: Commands) {
     let board = Board::new(4);
     commands
@@ -73,6 +74,9 @@ struct Position {
     y_axis: u8,
 }
 
+#[derive(Component)]
+struct TileText;
+
 fn spawn_tiles(mut comands: Commands, query_board: Query<&Board>) {
     let board = query_board.single();
     let mut rng = rand::thread_rng();
@@ -84,6 +88,7 @@ fn spawn_tiles(mut comands: Commands, query_board: Query<&Board>) {
             x_axis: *pos_x,
             y_axis: *pos_y,
         };
+        let points = Points { value: 2usize };
         let (x, y, z) = board.tile_position_on_board(pos.x_axis, pos.y_axis, 2.0);
         comands
             .spawn(SpriteBundle {
@@ -95,7 +100,24 @@ fn spawn_tiles(mut comands: Commands, query_board: Query<&Board>) {
                 transform: Transform::from_xyz(x, y, z),
                 ..Default::default()
             })
-            .insert(Points { value: 2usize })
+            .with_children(|child_builder| {
+                child_builder
+                    .spawn(Text2dBundle {
+                        text: Text::from_section(
+                            points.value.to_string(),
+                            TextStyle {
+                                font_size: TILE_SIZE * 0.9,
+                                color: colors::TEXT,
+                                ..Default::default()
+                            },
+                        )
+                        .with_justify(JustifyText::Center),
+                        transform: Transform::from_xyz(0.0, 0.0, 1.0),
+                        ..Default::default()
+                    })
+                    .insert(TileText);
+            })
+            .insert(points)
             .insert(pos);
     }
 }
@@ -110,6 +132,9 @@ fn main() {
             }),
             ..Default::default()
         }))
-        .add_systems(Startup, (setup, (spawn_board, spawn_tiles).chain()))
+        .add_systems(
+            Startup,
+            (setup, (spawn_board, apply_deferred, spawn_tiles).chain()),
+        )
         .run();
 }

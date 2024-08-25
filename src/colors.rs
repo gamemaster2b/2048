@@ -21,6 +21,13 @@ pub const TILE: Color = Color::Oklcha(bevy::color::Oklcha {
     alpha: 1.0,
 });
 
+pub const TEXT: Color = Color::Oklcha(bevy::color::Oklcha {
+    lightness: 0.50,
+    chroma: 0.14,
+    hue: 330.06,
+    alpha: 1.0,
+});
+
 pub const CLEAR_COLOR: Color = Color::Oklcha(bevy::color::Oklcha {
     lightness: 0.2706,
     chroma: 0.035,
