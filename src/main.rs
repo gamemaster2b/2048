@@ -1,7 +1,7 @@
 use bevy::prelude::*;
 use itertools::Itertools;
 use rand::seq::IteratorRandom;
-use uwuifier::uwuify_str_sse;
+/*use uwuifier::uwuify_str_sse;*/
 mod colors;
 
 fn setup(mut commands: Commands) {
@@ -124,7 +124,8 @@ fn spawn_tiles(mut comands: Commands, query_board: Query<&Board>) {
 }
 
 fn main() {
-    println!("{}", uwuify_str_sse("hello world"));
+    /*println!("{}", uwuify_str_sse("hello world"));*/
+    
     App::new()
         .insert_resource(ClearColor(colors::CLEAR_COLOR))
         .add_plugins(DefaultPlugins.set(WindowPlugin {
