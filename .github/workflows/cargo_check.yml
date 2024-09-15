@@ -17,5 +17,10 @@ jobs:
 
     steps:
     - uses: actions/checkout@v4
+    - name: Add targets and mingw64
+      run: |
+        apt-get update
+        apt-get install -y mingw-w64
+        rustup target add x86_64-pc-windows-gnu
     - name: Run checks
       run: cargo check --verbose
